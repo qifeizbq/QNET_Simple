@@ -1,0 +1,46 @@
+name: Build QNET IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build IPA
+        run: |
+          xcodebuild archive \
+            -project QNET_Simple.xcodeproj \
+            -scheme QNET \
+            -archivePath ./QNET.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            2>&1
+
+      - name: Export IPA
+        run: |
+          mkdir -p Payload
+          cp -R ./QNET.xcarchive/Products/Applications/QNET.app ./Payload/
+          zip -r QNET_Simple.ipa Payload/
+          rm -rf Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: QNET_Simple.ipa
+          path: QNET_Simple.ipa

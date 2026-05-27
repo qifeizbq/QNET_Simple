@@ -1,0 +1,53 @@
+name: QNET_Simple
+options:
+  bundleIdPrefix: com.tencent.qnet
+  deploymentTarget:
+    iOS: "13.0"
+  xcodeVersion: "13.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CLANG_ENABLE_MODULES: YES
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  QNET:
+    type: application
+    platform: iOS
+    sources:
+      - path: QNET
+        type: group
+      - path: Shared
+        type: group
+    settings:
+      base:
+        INFOPLIST_FILE: QNET/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.tencent.qnet.simple
+        CODE_SIGN_ENTITLEMENTS: QNET/QNET.entitlements
+        CODE_SIGN_STYLE: Manual
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        DEVELOPMENT_TEAM: ""
+    preBuildScripts:
+      - name: "Empty"
+        script: "echo build start"
+    dependencies:
+      - target: PacketHandler
+
+  PacketHandler:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PacketHandler
+        type: group
+      - path: Shared
+        type: group
+    settings:
+      base:
+        INFOPLIST_FILE: PacketHandler/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.tencent.qnet.simple.packet-handler
+        CODE_SIGN_ENTITLEMENTS: PacketHandler/PacketHandler.entitlements
+        CODE_SIGN_STYLE: Manual
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        DEVELOPMENT_TEAM: ""
+    dependencies: []
