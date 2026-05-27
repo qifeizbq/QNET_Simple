@@ -7,21 +7,29 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      - name: Discover Xcode
+        run: |
+          ls /Applications/Xcode*.app/Contents/Developer 2>/dev/null || true
+          echo "Using default:"
+          xcodebuild -version
+          XCODE_PATH=$(xcode-select -p)
+          echo "XCODE_PATH=$XCODE_PATH" >> $GITHUB_ENV
 
       - name: Install XcodeGen
         run: brew install xcodegen
 
       - name: Generate Xcode Project
-        run: DEVELOPER_DIR=$(xcode-select -p) xcodegen generate
+        run: |
+          export DEVELOPER_DIR="$XCODE_PATH"
+          xcodegen generate
 
       - name: Build IPA
         run: |
+          export DEVELOPER_DIR="$XCODE_PATH"
           xcodebuild archive             -project QNET_Simple.xcodeproj             -scheme QNET             -archivePath ./QNET.xcarchive             -destination "generic/platform=iOS"             CODE_SIGN_STYLE=Manual             CODE_SIGN_IDENTITY=""             CODE_SIGNING_REQUIRED=NO             CODE_SIGNING_ALLOWED=NO             DEVELOPMENT_TEAM=""             PROVISIONING_PROFILE_SPECIFIER=""
 
       - name: Export IPA
