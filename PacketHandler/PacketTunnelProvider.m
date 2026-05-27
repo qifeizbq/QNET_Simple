@@ -13,7 +13,8 @@
 @implementation PacketTunnelProvider
 
 - (void)startTunnelWithOptions:(NSDictionary *)options completionHandler:(void (^)(NSError *))completionHandler {
-    NSDictionary *config = (NSDictionary *)self.protocolConfiguration.providerConfiguration;
+    NETunnelProviderProtocol *proto = (NETunnelProviderProtocol *)self.protocolConfiguration;
+    NSDictionary *config = proto.providerConfiguration;
     NSString *server = config[@"server"] ?: @"106.54.179.198";
     NSNumber *port = config[@"port"] ?: @8888;
 
