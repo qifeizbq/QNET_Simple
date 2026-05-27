@@ -11,20 +11,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Force Xcode 15.4
-        run: |
-          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
-          xcodebuild -version
-
       - name: Install XcodeGen
         run: brew install xcodegen
 
       - name: Generate Xcode Project
         run: xcodegen generate
 
+      - name: Fix Xcode format compatibility
+        run: |
+          sed -i '' 's/objectVersion = 77;/objectVersion = 56;/g' QNET_Simple.xcodeproj/project.pbxproj
+          echo "Fixed project format"
+
       - name: Build IPA
         run: |
-          xcodebuild archive             -project QNET_Simple.xcodeproj             -scheme QNET             -archivePath ./QNET.xcarchive             -destination "generic/platform=iOS"             CODE_SIGN_STYLE=Manual             CODE_SIGN_IDENTITY=""             CODE_SIGNING_REQUIRED=NO             CODE_SIGNING_ALLOWED=NO             DEVELOPMENT_TEAM=""             PROVISIONING_PROFILE_SPECIFIER=""
+          xcodebuild archive \
+            -project QNET_Simple.xcodeproj \
+            -scheme QNET \
+            -archivePath ./QNET.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
 
       - name: Export IPA
         run: |
