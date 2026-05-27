@@ -11,25 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Discover Xcode
+      - name: Force Xcode 15.4
         run: |
-          ls /Applications/Xcode*.app/Contents/Developer 2>/dev/null || true
-          echo "Using default:"
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
           xcodebuild -version
-          XCODE_PATH=$(xcode-select -p)
-          echo "XCODE_PATH=$XCODE_PATH" >> $GITHUB_ENV
 
       - name: Install XcodeGen
         run: brew install xcodegen
 
       - name: Generate Xcode Project
-        run: |
-          export DEVELOPER_DIR="$XCODE_PATH"
-          xcodegen generate
+        run: xcodegen generate
 
       - name: Build IPA
         run: |
-          export DEVELOPER_DIR="$XCODE_PATH"
           xcodebuild archive             -project QNET_Simple.xcodeproj             -scheme QNET             -archivePath ./QNET.xcarchive             -destination "generic/platform=iOS"             CODE_SIGN_STYLE=Manual             CODE_SIGN_IDENTITY=""             CODE_SIGNING_REQUIRED=NO             CODE_SIGNING_ALLOWED=NO             DEVELOPMENT_TEAM=""             PROVISIONING_PROFILE_SPECIFIER=""
 
       - name: Export IPA
